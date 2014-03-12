@@ -23,13 +23,11 @@ app.createController('Game', {
         console.log('gueim update...');
 
         /* Population & food */
-        app.Game.food += 2 * app.Game.build.farm - Math.floor(app.Game.pop / 2);
+        var delta = 2 * app.Game.build.farm - Math.floor(app.Game.pop / 2);
 
-        if (app.Game.food > 0) {
+        if (delta > 0) {
+            app.Game.food += delta;
             app.Game.pop += app.Game.build.house;
-        } else {
-            app.Game.pop--;
-            app.Game.food = 0;
         }
 
         if (app.Game.pop == 0) {

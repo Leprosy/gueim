@@ -25,6 +25,6 @@ var app = new Llama.Application({
 
         setInterval(function() {
             app.controllers.Game.update();
-        }, 3000);
+        }, 1000);
     }
 });
