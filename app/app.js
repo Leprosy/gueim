@@ -5,11 +5,12 @@ var app = new Llama.Application({
 
     ready: function() {
         /* Game attribs */
-        app.Game = {
+        app.Game = {};
+
+        app.Game.data = {
             pop: 5,
             gold: 1000,
             food: 50,
-            terr: 10,
 
             build: {
                 house: 0,
@@ -20,11 +21,21 @@ var app = new Llama.Application({
             }
         };
 
+        app.Game.param = {
+            costs: {
+                house: 250,
+                farm: 200,
+                barrack: 2000,
+                library: 2000,
+                mine: 500
+            }
+        };
+
         console.debug('gueim ready');
         app.controllers.Game.index();
 
-        setInterval(function() {
+        app.job = setInterval(function() {
             app.controllers.Game.update();
-        }, 1000);
+        }, 2000);
     }
 });

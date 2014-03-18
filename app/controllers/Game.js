@@ -1,12 +1,4 @@
 app.createController('Game', {
-    costs: {
-        house: 250,
-        farm: 200,
-        barrack: 2000,
-        library: 2000,
-        mine: 500
-    },
-
     views: ['gameindex'],
 
     ready: function() {
@@ -22,46 +14,65 @@ app.createController('Game', {
     update: function() {
         console.log('gueim update...');
 
-        /* Population & food */
-        var delta = 2 * app.Game.build.farm - Math.floor(app.Game.pop / 2);
+        /*
+         * Population & food rules
+         * 
+         * House = 6 people
+         * Farm = 4 food per cycle
+         * Population increases 1 per cycle until they have no more room
+         * Each people eat one food per cycle
+         */
+        var delta = 6 * app.Game.data.build.farm - app.Game.data.pop;
 
-        if (delta > 0) {
-            app.Game.food += delta;
-            app.Game.pop += app.Game.build.house;
+        /* Enough food to support pop */
+        if (app.Game.data.food + delta >= 0) {
+            app.Game.data.food += delta;
+
+            if (app.Game.data.pop < (app.Game.data.build.house * 6)) {
+                app.Game.data.pop++;
+            }
+        } else { /* Starvation...bad */
+            app.Game.data.pop--;
+            app.Game.data.food = 0;
         }
 
-        if (app.Game.pop == 0) {
+        if (app.Game.data.pop == 0) {
+            clearInterval(app.job);
             alert('game over');
         }
 
-        /* Gold */
-        app.Game.gold += 10 * app.Game.build.mine;
+        /*
+         * Gold
+         * 
+         * Mine = 10 gold per cycle
+         */
+        app.Game.data.gold += 10 * app.Game.data.build.mine;
 
         /* Update view */
         this.index();
     },
 
     build: function(key) {
-        if (app.Game.gold < this.costs[key]) {
+        if (app.Game.data.gold < app.Game.param.costs[key]) {
             alert('not enough gold');
             return;
         }
 
-        app.Game.gold -= this.costs[key];
-        app.Game.build[key]++;
+        app.Game.data.gold -= app.Game.param.costs[key];
+        app.Game.data.build[key]++;
 
         /* Update */
         app.controllers.Game.index();
     },
 
     load: function() {
-        app.Game = JSON.parse(app.controllers.Cookie.readCookie('data'));
+        app.Game.data = JSON.parse(app.controllers.Cookie.readCookie('data'));
         this.index();
         alert('game loaded');
     },
 
     save: function() {
-        app.controllers.Cookie.createCookie('data', JSON.stringify(app.Game));
+        app.controllers.Cookie.createCookie('data', JSON.stringify(app.Game.data));
         alert('game saved');
     }
 
